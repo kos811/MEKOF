@@ -51,6 +51,12 @@ implementation
 
 {$R *.DFM}
 
+function ClearCLRFText(Text:string):string;
+begin
+  Result:=stringreplace(Text,#13,'',[rfreplaceall]);
+  Result:=stringreplace(Result,#10,'',[rfreplaceall]);
+end;
+
 function ParseMarker(marker:string):TMarker;
 begin
   if length(marker) <> 24 then
@@ -75,10 +81,15 @@ procedure TMainForm.ParseBtnClick(Sender: TObject);
     result := format('[%s]'#9'[%d]'#9#39'%s'#39#9'%s',[MarkerPos, length(MarkerPart), MarkerPart , MarkerFullDef]);
   end;
 var
-  s:             string;
-  Marker:        TMarker;
-  i:             integer;
-  ThesaurusLen:  integer;
+  s:                    string;
+  Marker:               TMarker;
+  i:                    integer;
+  ThesaurusLen:         integer;
+  Thesaurus:            string;
+  DataFieldLength:      Integer;
+  FirstCharPosLength:   Integer;
+  UsePartLength:        Integer;
+  TermLength:           Integer;
 begin
   s := SourceMmo.Text;
   Marker := ParseMarker(copy(s,1,24));
@@ -88,10 +99,22 @@ begin
     MarkerMmo.Lines.Add(MakeDefString(MarkerPos[i] ,Marker[i], markerFullDef[i]));
   end;
   ThesaurusLen := strtoint(marker[5])+5;
+  Thesaurus := copy(s,25,ThesaurusLen);
+  Thesaurus := ClearCLRFText(Thesaurus);
 
 //  узнать у преподавателя - переводы строк лишние или нет?
 //  если нет, то считать ли оба символа (/r/n) или как один?
-  ThesaurusMmo.Text := copy(s,25,ThesaurusLen);
+  //ThesaurusMmo.Text  := Thesaurus;
+  DataFieldLength    := StrToInt(Marker[8]);
+  FirstCharPosLength := StrToInt(Marker[9]);
+  UsePartLength      := StrToInt(Marker[10]);
+  TermLength         := 3 + DataFieldLength + FirstCharPosLength + UsePartLength;
+  i := 1;
+  while I<ThesaurusLen do
+  begin
+    ThesaurusMmo.Lines.Add(Copy(Thesaurus,i,TermLength));
+    i:=i+TermLength;
+  end;
 end;
 
 
@@ -100,10 +123,11 @@ procedure TMainForm.Button1Click(Sender: TObject);
 var s:string;
 begin
   s:=SourceMmo.Text;
-  s:=stringreplace(s,#13,'',[rfreplaceall]); 
+  s:=stringreplace(s,#13,'',[rfreplaceall]);
   s:=stringreplace(s,#10,'',[rfreplaceall]);
   showmessage(s[475]);
   //memo1.Commatext;
 end;
 
 end.
+

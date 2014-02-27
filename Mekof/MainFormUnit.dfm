@@ -1,9 +1,9 @@
 object MainForm: TMainForm
-  Left = 192
-  Top = 125
+  Left = 149
+  Top = 18
+  Width = 866
+  Height = 540
   Caption = 'MainForm'
-  ClientHeight = 578
-  ClientWidth = 960
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,19 +13,19 @@ object MainForm: TMainForm
   Menu = MainMenu1
   OldCreateOrder = False
   DesignSize = (
-    960
-    578)
+    858
+    494)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 195
+    Left = 243
     Top = 232
     Width = 60
     Height = 13
     Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082
   end
   object Label2: TLabel
-    Left = 195
+    Left = 243
     Top = 0
     Width = 107
     Height = 13
@@ -34,8 +34,8 @@ object MainForm: TMainForm
   object SourceMmo: TMemo
     Left = 0
     Top = 0
-    Width = 193
-    Height = 578
+    Width = 233
+    Height = 494
     Align = alLeft
     Lines.Strings = (
       '02221131001200475 004530'
@@ -118,23 +118,24 @@ object MainForm: TMainForm
       '+A'#1050#1080#1088#1080#1083#1083#1086#1074' '#1053'. '#1055'.# +A'#1058#1072#1088#1072#1089#1102#1082' '#1070'. '
       #1060'.# +A201.01.04+B059000001# '
       '+A04# +A'#1045'. '#1050'.#0+A'#1063'. 1# +C973838#!')
+    ScrollBars = ssVertical
     TabOrder = 0
   end
   object MarkerMmo: TMemo
-    Left = 195
+    Left = 240
     Top = 16
-    Width = 763
+    Width = 617
     Height = 217
     Anchors = [akLeft, akTop, akRight]
     ScrollBars = ssHorizontal
     TabOrder = 1
   end
   object ThesaurusMmo: TMemo
-    Left = 195
-    Top = 251
-    Width = 249
-    Height = 161
-    Anchors = [akLeft, akTop, akRight]
+    Left = 240
+    Top = 248
+    Width = 161
+    Height = 243
+    Anchors = [akLeft, akTop, akBottom]
     ScrollBars = ssBoth
     TabOrder = 2
   end
