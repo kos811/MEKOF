@@ -12,11 +12,13 @@ type
     SourceMmo: TMemo;
     MarkerMmo: TMemo;
     ParseBtn: TMenuItem;
-    ThesaurusMmo: TMemo;
     Label1: TLabel;
     Label2: TLabel;
+    ThesaurusList: TListBox;
+    ThesaurusMemo: TMemo;
     procedure ParseBtnClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure ThesaurusListClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -45,7 +47,10 @@ const
   );
 
 var
-  MainForm: TMainForm;
+  MainForm:             TMainForm;
+  DataFieldLength:      Integer;
+  FirstCharPosLength:   Integer;
+  UsePartLength:        Integer;
 
 implementation
 
@@ -86,9 +91,6 @@ var
   i:                    integer;
   ThesaurusLen:         integer;
   Thesaurus:            string;
-  DataFieldLength:      Integer;
-  FirstCharPosLength:   Integer;
-  UsePartLength:        Integer;
   TermLength:           Integer;
 begin
   s := SourceMmo.Text;
@@ -109,10 +111,11 @@ begin
   FirstCharPosLength := StrToInt(Marker[9]);
   UsePartLength      := StrToInt(Marker[10]);
   TermLength         := 3 + DataFieldLength + FirstCharPosLength + UsePartLength;
+  ThesaurusList.Clear();
   i := 1;
   while I<ThesaurusLen do
   begin
-    ThesaurusMmo.Lines.Add(Copy(Thesaurus,i,TermLength));
+    ThesaurusList.Items.Add(Copy(Thesaurus,i,TermLength));
     i:=i+TermLength;
   end;
 end;
@@ -127,6 +130,28 @@ begin
   s:=stringreplace(s,#10,'',[rfreplaceall]);
   showmessage(s[475]);
   //memo1.Commatext;
+end;
+
+function ThesaurusRep(caption: string; length:integer; text: string):string;
+begin
+  result:=Format('%s[%d]:'#9'%s',[caption, length,text])
+end;
+
+procedure TMainForm.ThesaurusListClick(Sender: TObject);
+var
+  ind:  Integer;
+  article: string;
+begin
+  ThesaurusMemo.Clear();
+  article := ThesaurusList.Items[ThesaurusList.ItemIndex];
+  ind:=1;
+  ThesaurusMemo.Lines.Add(ThesaurusRep('Ìåòêà', 3, Copy(article,1,3)));
+  ind := ind +3;
+  ThesaurusMemo.Lines.Add(ThesaurusRep('ÏÄ', DataFieldLength, Copy(article,ind,DataFieldLength)));
+  ind := ind +DataFieldLength;
+  ThesaurusMemo.Lines.Add(ThesaurusRep('ÏÍÑ', FirstCharPosLength, Copy(article,ind,FirstCharPosLength)));
+  ind := ind +FirstCharPosLength;
+  ThesaurusMemo.Lines.Add(ThesaurusRep('×ÎÏ', UsePartLength, Copy(article,ind,UsePartLength)));
 end;
 
 end.

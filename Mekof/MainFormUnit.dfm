@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 149
-  Top = 18
-  Width = 866
-  Height = 540
+  Left = 223
+  Top = 131
+  Width = 950
+  Height = 814
   Caption = 'MainForm'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,8 +13,8 @@ object MainForm: TMainForm
   Menu = MainMenu1
   OldCreateOrder = False
   DesignSize = (
-    858
-    494)
+    942
+    763)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -35,7 +35,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 233
-    Height = 494
+    Height = 763
     Align = alLeft
     Lines.Strings = (
       '02221131001200475 004530'
@@ -124,20 +124,29 @@ object MainForm: TMainForm
   object MarkerMmo: TMemo
     Left = 240
     Top = 16
-    Width = 617
+    Width = 701
     Height = 217
     Anchors = [akLeft, akTop, akRight]
     ScrollBars = ssHorizontal
     TabOrder = 1
   end
-  object ThesaurusMmo: TMemo
-    Left = 240
+  object ThesaurusList: TListBox
+    Left = 239
     Top = 248
-    Width = 161
-    Height = 243
+    Width = 217
+    Height = 321
     Anchors = [akLeft, akTop, akBottom]
-    ScrollBars = ssBoth
+    ItemHeight = 13
     TabOrder = 2
+    OnClick = ThesaurusListClick
+  end
+  object ThesaurusMemo: TMemo
+    Left = 239
+    Top = 576
+    Width = 217
+    Height = 185
+    Anchors = [akLeft, akTop, akBottom]
+    TabOrder = 3
   end
   object MainMenu1: TMainMenu
     Left = 192
