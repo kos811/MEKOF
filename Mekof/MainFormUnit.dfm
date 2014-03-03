@@ -12,10 +12,7 @@ object MainForm: TMainForm
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-  DesignSize = (
-    942
-    763)
-  PixelsPerInch = 96
+   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 243
