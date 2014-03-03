@@ -34,7 +34,8 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>C:\Users\KMT.SFT2000\Desktop\Mekof;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_N>true</DCC_N>
@@ -44,16 +45,16 @@
         <DCC_DebugInformation>true</DCC_DebugInformation>
         <DCC_K>false</DCC_K>
         <DCC_WriteableConstants>true</DCC_WriteableConstants>
-        <DebugSourcePath>C:\Users\KMT.SFT2000\Desktop\Mekof;$(DebugSourcePath)</DebugSourcePath>
-        <DCC_DcpOutput>C:\Users\KMT.SFT2000\Desktop\Mekof</DCC_DcpOutput>
+        <DebugSourcePath>$(DebugSourcePath)</DebugSourcePath>
+        <DCC_DcpOutput></DCC_DcpOutput>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;$(DCC_Namespace)</DCC_Namespace>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Alignment>1</DCC_Alignment>
         <DCC_UsePackage>Vcl50;Vclx50;VclSmp50;Vcldb50;vclado50;ibevnt50;Vclbde50;vcldbx50;Qrpt50;TeeUI50;TeeDB50;Tee50;Dss50;TeeQR50;VCLIB50;Vclmid50;vclie50;Inetdb50;Inet50;NMFast50;webmid50;dclocx50;dclaxserver50;JclD50;JclVclD50;JvCoreD5R;JvSystemD5R;JvStdCtrlsD5R;JvAppFrmD5R;JvBandsD5R;JvDBD5R;JvDlgsD5R;JvBDED5R;JvCmpD5R;JvCryptD5R;JvCtrlsD5R;JvCustomD5R;JvDockingD5R;JvDotNetCtrlsD5R;JvEDID5R;JvGlobusD5R;JvHMID5R;JvInterpreterD5R;JvJansD5R;JvManagedThreadsD5R;JvMMD5R;JvNetD5R;JvPageCompsD5R;JvPluginD5R;JvPrintPreviewD5R;JvRuntimeDesignD5R;JvTimeFrameworkD5R;JvValidatorsD5R;JvWizardD5R;JvXPCtrlsD5R;$(DCC_UsePackage)</DCC_UsePackage>
-        <DCC_ExeOutput>C:\Users\KMT.SFT2000\Desktop\Mekof</DCC_ExeOutput>
-        <DCC_BplOutput>C:\Users\KMT.SFT2000\Desktop\Mekof</DCC_BplOutput>
-        <DCC_DcuOutput>C:\Users\KMT.SFT2000\Desktop\Mekof</DCC_DcuOutput>
+        <DCC_ExeOutput></DCC_ExeOutput>
+        <DCC_BplOutput></DCC_BplOutput>
+        <DCC_DcuOutput></DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>

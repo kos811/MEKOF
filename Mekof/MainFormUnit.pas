@@ -27,6 +27,29 @@ type
 
 type
   TMarker =  array[0..11] of String;
+
+type
+  TMekofField = class(TObject)
+    public
+      Tag:            string;
+      Length:         string;
+      FirstSymbolPos: string;
+      Chop:           string;
+  end;
+
+type
+  TFieldlist = array of TMekofField;
+  end;
+
+
+
+type
+  TMekofRecord = class(TObject)
+    public
+      Marker: TMarker;
+      Fields: tfield
+  end;
+
 const
   //MarkerDef : TMarker = ('Длина записи','asd');
   MarkerPos:     TMarker = ('0-4', '5', '6-9', '10', '11', '12-16', '17', '18,19', '20', '21', '22', '23');
@@ -126,15 +149,15 @@ procedure TMainForm.Button1Click(Sender: TObject);
 var s:string;
 begin
   s:=SourceMmo.Text;
-  s:=stringreplace(s,#13,'',[rfreplaceall]);
-  s:=stringreplace(s,#10,'',[rfreplaceall]);
+  s:=stringreplace(s,#13,'',[rfReplaceAll]);
+  s:=stringreplace(s,#10,'',[rfReplaceAll]);
   showmessage(s[475]);
   //memo1.Commatext;
 end;
 
-function ThesaurusRep(caption: string; length:integer; text: string):string;
+function ThesaurusRep( length:integer; text: string; Desription: string):string;
 begin
-  result:=Format('%s[%d]:'#9'%s',[caption, length,text])
+  result:=Format('[%d]:'#9'%s'#9'%s',[length,text,Desription])
 end;
 
 procedure TMainForm.ThesaurusListClick(Sender: TObject);
@@ -145,13 +168,28 @@ begin
   ThesaurusMemo.Clear();
   article := ThesaurusList.Items[ThesaurusList.ItemIndex];
   ind:=1;
-  ThesaurusMemo.Lines.Add(ThesaurusRep('Метка', 3, Copy(article,1,3)));
+  ThesaurusMemo.Lines.Add('Длина'#9'Параметр'#9'Описание');
+  ThesaurusMemo.Lines.Add(ThesaurusRep(3,
+                                       Copy(article,1,3),
+                                       'Метка'));
   ind := ind +3;
-  ThesaurusMemo.Lines.Add(ThesaurusRep('ПД', DataFieldLength, Copy(article,ind,DataFieldLength)));
+  ThesaurusMemo.Lines.Add(ThesaurusRep( DataFieldLength,
+                                        Copy(article,ind,DataFieldLength),
+                                        'длина поля данных  - определяется: 1) общим количеством символов (включая индикатор и разделитель поля) в поле данных, идентифицируемом данной меткой, или 2) нулем, обозначающим, что данная статья справочника относится к полю данных, общая длина котор'+
+                                        'орого превышает наибольшее допустимое десятичное число (n), которое может содержаться в компоненте "длина поля данных" статьи справочника. В таком случае поле данных рассматривается как разделенное на несколько частей, длина каждой из которых, за исключен' +
+                                        'ием последней, равна n. Каждая часть имеет свою статью справочника, содержащую "метку", и "часть, определяемую при применении" поля данных, а также "позицию начального символа" той части, к которой относится эта статья справочника. Нулевое значение длины ' +
+                                        'поля данных означает, что данная статья адресуется к той части поля данных, которая не является последней, а ее длина равна n; или 3) количеством символов (включая разделитель поля) в последней части поля данных, описанного в п.2. В случаях, описанных' +
+                                        ' в пп. 2 и 3, все статьи справочника, относящиеся к частям одного и того же поля данных, должны следовать друг за другом в той же последовательности, что и сами части поля данных;'
+                                       ));
   ind := ind +DataFieldLength;
-  ThesaurusMemo.Lines.Add(ThesaurusRep('ПНС', FirstCharPosLength, Copy(article,ind,FirstCharPosLength)));
+  ThesaurusMemo.Lines.Add(ThesaurusRep(FirstCharPosLength,
+                                        Copy(article,ind,FirstCharPosLength),
+                                        'позиция начального символа - десятичное число, определяющее позицию первого символа поля данных, идентифицируемого предшествующей меткой, относительно базового адреса данных (позиция начального символа первого поля данных, следующего непосредственно за сп'+
+                                        'справочником, равна нулю); '));
   ind := ind +FirstCharPosLength;
-  ThesaurusMemo.Lines.Add(ThesaurusRep('ЧОП', UsePartLength, Copy(article,ind,UsePartLength)));
+  ThesaurusMemo.Lines.Add(ThesaurusRep( UsePartLength,
+                                        Copy(article,ind,UsePartLength),
+                                        'часть, определяемая при применении (ЧОП) - предназначена для представления дополнительной информации, относящейся к полю данных, идентифицируемому этой статьей справочника. '));
 end;
 
 end.

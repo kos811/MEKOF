@@ -1,9 +1,9 @@
 object MainForm: TMainForm
   Left = 223
   Top = 131
-  Width = 950
-  Height = 814
   Caption = 'MainForm'
+  ClientHeight = 755
+  ClientWidth = 934
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,7 +12,10 @@ object MainForm: TMainForm
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-   PixelsPerInch = 96
+  DesignSize = (
+    934
+    755)
+  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 243
@@ -32,7 +35,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 233
-    Height = 763
+    Height = 755
     Align = alLeft
     Lines.Strings = (
       '02221131001200475 004530'
@@ -131,7 +134,7 @@ object MainForm: TMainForm
     Left = 239
     Top = 248
     Width = 217
-    Height = 321
+    Height = 301
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
     TabOrder = 2
@@ -141,9 +144,11 @@ object MainForm: TMainForm
     Left = 239
     Top = 576
     Width = 217
-    Height = 185
+    Height = 165
     Anchors = [akLeft, akTop, akBottom]
+    ScrollBars = ssHorizontal
     TabOrder = 3
+    WordWrap = False
   end
   object MainMenu1: TMainMenu
     Left = 192
