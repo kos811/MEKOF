@@ -130,7 +130,7 @@ object MainForm: TMainForm
     ScrollBars = ssHorizontal
     TabOrder = 1
   end
-  object ThesaurusList: TListBox
+  object ReferenceList: TListBox
     Left = 239
     Top = 248
     Width = 217
@@ -138,9 +138,9 @@ object MainForm: TMainForm
     Anchors = [akLeft, akTop, akBottom]
     ItemHeight = 13
     TabOrder = 2
-    OnClick = ThesaurusListClick
+    OnClick = ReferenceListClick
   end
-  object ThesaurusMemo: TMemo
+  object ReferenceMemo: TMemo
     Left = 239
     Top = 576
     Width = 217
@@ -156,6 +156,9 @@ object MainForm: TMainForm
     object ParseBtn: TMenuItem
       Caption = 'Parse'
       OnClick = ParseBtnClick
+    end
+    object LoadStructBtn: TMenuItem
+      Caption = 'LoadStruct'
     end
   end
 end
