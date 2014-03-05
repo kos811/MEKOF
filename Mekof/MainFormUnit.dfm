@@ -159,6 +159,7 @@ object MainForm: TMainForm
     end
     object LoadStructBtn: TMenuItem
       Caption = 'LoadStruct'
+      OnClick = LoadStructBtnClick
     end
   end
 end
