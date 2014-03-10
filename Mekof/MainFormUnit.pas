@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Menus, StdCtrls, Math;
+  Menus, StdCtrls, Math, Vcl.Buttons;
 
 {$REGION 'TForm1'}
 
@@ -19,10 +19,14 @@ type
     ReferenceList: TListBox;
     ReferenceMemo: TMemo;
     LoadStructBtn: TMenuItem;
+    Memo1: TMemo;
+    BitBtn1: TBitBtn;
+    SaveDialog1: TSaveDialog;
     procedure ParseBtnClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure ReferenceListClick(Sender: TObject);
     procedure LoadStructBtnClick(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -50,35 +54,44 @@ type
   end;
 
 type
-  TMekofField = class(TObject)
-    Description: string;
-    Value: string;
-    Constructor Create(Description: string; Value: string);
+  TMekofFieldDef = class(TObject)
+  public
+    Tag:string;
+    Length:Integer;
+    StartPos:integer;
+    CHOP:string;
+    function GetSource:string;
+    Constructor Create(Def:string;DefAlloc:TMekofTermDef);
   end;
 
 type
-  TMekofFieldList = array of TMekofField;
+  TMekofField = class(TObject)
+  public
+    Description: TMekofFieldDef;
+    Value: string;
+    Constructor Create(Description: TMekofFieldDef; Value: string);
+  end;
 
-Type
-  TMekofReference = class(TObject)
-  private                       
+type
+  TMekofFieldList = Class(TObject)
+  private
     function  GetLength(): Integer;
   public
-    TermDef: TMekofTermDef;
-    FieldDefs: TMekofFieldList;
-    Constructor Create(Text: string; TermDef: TMekofTermDef);  
-    property Length : integer read GetLength; 
+    Fields:array of TMekofField;
+    TermDefinition:TMekofTermDef;
+    property Length : integer read GetLength;
+    Constructor Create(Reference:string;TermDef:TMekofTermDef;DataText:String);
   end;
 
 type
-  TMekofRecord = class(TObject)  
+  TMekofRecord = class(TObject)
   private
-    SourceText: string; 
+    SourceText: string;
   public
     Marker: TMekofMarker;
     Fields: TMekofFieldList;
-    Reference: TMekofReference;
-    Constructor Create(SourceText: string); 
+//    Reference: TMekofReference;
+    Constructor Create(SourceText: string);
   end;
 {$ENDREGION}
 {$REGION 'Const'}
@@ -102,6 +115,16 @@ const
     'позиция 21 - десятичная цифра, указывающая длину в символах компонента "позиция начального символа" каждой статьи справочника;',
     'позиция 22 - десятичная цифра, указывающая длину в символах компонента "часть, определяемая при применении" (ЧОП) каждой статьи справочника;',
     'позиция 23 - зарезервирована.');
+   ReferenceDef: array [0..3] of string = ('Метка',
+    'длина поля данных  - определяется: 1) общим количеством символов (включая индикатор и разделитель поля) в поле данных, идентифицируемом данной меткой, или 2) нулем, обозначающим, что данная статья справочника относится к полю данных, общая длина котор'
+    + 'орого превышает наибольшее допустимое десятичное число (n), которое может содержаться в компоненте "длина поля данных" статьи справочника. В таком случае поле данных рассматривается как разделенное на несколько частей, длина каждой из которых, за исключен'
+    + 'ием последней, равна n. Каждая часть имеет свою статью справочника, содержащую "метку", и "часть, определяемую при применении" поля данных, а также "позицию начального символа" той части, к которой относится эта статья справочника. Нулевое значение длины '
+    + 'поля данных означает, что данная статья адресуется к той части поля данных, которая не является последней, а ее длина равна n; или 3) количеством символов (включая разделитель поля) в последней части поля данных, описанного в п.2. В случаях, описанных'
+    + ' в пп. 2 и 3, все статьи справочника, относящиеся к частям одного и того же поля данных, должны следовать друг за другом в той же последовательности, что и сами части поля данных;',
+    'позиция начального символа - десятичное число, определяющее позицию первого символа поля данных, идентифицируемого предшествующей меткой, относительно базового адреса данных (позиция начального символа первого поля данных, следующего непосредственно за сп'
+    + 'справочником, равна нулю); ',
+    'часть, определяемая при применении (ЧОП) - предназначена для представления дополнительной информации, относящейся к полю данных, идентифицируемому этой статьей справочника. ');
+
 {$ENDREGION}
 
 var
@@ -113,10 +136,22 @@ implementation
 {$R *.DFM}
 {$REGION 'NoClass Methods'}
 
+  function MakeDefString(MarkerPos: String; MarkerPart: string;
+    MarkerFullDef: string): string;
+  begin
+    Result := format('[%s]'#9'[%d]'#9#39'%s'#39#9'%s',
+      [MarkerPos, Length(MarkerPart), MarkerPart, MarkerFullDef]);
+  end;
+
 function ClearCLRFText(Text: string): string;
 begin
   Result := stringreplace(Text, #13, '', [rfreplaceall]);
   Result := stringreplace(Result, #10, '', [rfreplaceall]);
+end;
+
+function ReferenceRep(len:integer;text:string;capt:string):string;
+begin
+  result:= format('%d'#9'%s'#9'%s',[len,text,capt]);
 end;
 
 function ThesaurusRep(Length: integer; Text: string;
@@ -171,26 +206,12 @@ begin
 end;
 {$ENDREGION}
 
-Constructor TMekofField.Create(Description: string; Value: string);
+Constructor TMekofField.Create(Description: TMekofFieldDef; Value: string);
 begin
   self.Description := Description;
   self.Value := Value;
 end;
 
-Constructor TMekofReference.Create(Text: string; TermDef: TMekofTermDef);
-var
-  i: integer;
-  TermCount: integer;
-  Temp: string;
-begin
-  TermCount := Ceil(Text.Length / TermDef.TermLength);
-  SetLength(self.FieldDefs, TermCount);
-  for i := 0 to TermCount - 1 do
-    begin
-      Temp := copy(Text, TermDef.TermLength * i + 1, TermDef.TermLength);
-      self.FieldDefs[i] := TMekofField.Create(Temp, '');
-    end;
-end;
 
 Constructor TMekofRecord.Create(SourceText: string);
 var
@@ -207,44 +228,117 @@ var
   TermCount: integer;
 begin
   self.Marker := ParseMarker(copy(SourceText, 1, 24));
-  i := strtoint(Marker[5]) + 5;
-  RefText := copy(SourceText, 25, i);
-  self.Reference := TMekofReference.Create(RefText,
-    TMekofTermDef.Create('3', Marker[8], Marker[9], Marker[10]));
+  i := strtoint(Marker[5]);
+  RefText := copy(SourceText, 25, i-25);
   DataText := copy(SourceText,strtoint(Marker[5])+1,strtoint(Marker[0])-strtoint(Marker[5]));
-  setlength(  self.Fields,self.Reference.Length);
-  for I := 0 to self.Reference.Length do
-  begin
-  self.Fields[i] := Copy(DataText,);
-  end;
+  self.Fields := TMekofFieldList.Create(RefText,
+    TMekofTermDef.Create('3', Marker[8], Marker[9], Marker[10]),DataText);
 end;
 
-function TMekofReference.GetLength(): Integer;
+Constructor TMekofFieldList.Create(Reference:string;TermDef:TMekofTermDef;DataText:String);
+var
+  i: integer;
+  TermCount: integer;
+  Temp: string;
+  MekofFieldDef : TMekofFieldDef;
 begin
-  result := Length(self.FieldDefs);
+  TermDefinition := TermDef;
+  TermCount := Ceil(Reference.Length / TermDef.TermLength);
+  SetLength(self.Fields, TermCount);
+  for i := 0 to TermCount - 1 do
+    begin
+      Temp := copy(Reference, TermDef.TermLength * i + 1, TermDef.TermLength);
+      MekofFieldDef := TMekofFieldDef.Create(Temp,TermDefinition);
+      Temp := copy(DataText, MekofFieldDef.StartPos + 1, MekofFieldDef.Length-1);
+      self.Fields[i] := TMekofField.Create(MekofFieldDef, Temp);
+    end;
+end;
+
+function TMekofFieldList.GetLength(): Integer;
+begin
+  result := System.Length(Fields);
+end;
+
+function TMekofFieldDef.GetSource:string;
+function MakeLen(int:integer; len:integer):string;
+var s:string;
+begin
+  while System.Length(s)<len do
+  s:='0'+s;
+  result:=s;
+end;
+begin
+  result:=Tag + MakeLen(Length,)+inttostr(StartPos)+CHOP
+end;
+
+Constructor TMekofFieldDef.Create(Def:string;DefAlloc:TMekofTermDef);
+var
+i:integer;
+begin
+  i:=1;
+  self.Tag := copy(Def,i,DefAlloc.TagLength);
+  i:= i+DefAlloc.TagLength;
+  Self.Length:= strtoint(copy(Def,i,DefAlloc.FieldLength));
+  i:= i+DefAlloc.FieldLength;
+  Self.StartPos:=strtoint(copy(Def,i,DefAlloc.FirstSymbolPosLength));
+  i:= i+DefAlloc.FirstSymbolPosLength;
+  Self.CHOP:=copy(Def,i,DefAlloc.ChopLength);
 end;
 
 {$ENDREGION}
 {$REGION 'TForm1 Methods'}
 
+function GetNaim(key:string):string;
+begin
+end;
+
 procedure TMainForm.LoadStructBtnClick(Sender: TObject);
+function GetTerm(i:integer;Naim:string;Tag:string;FieldLen:string;FSP:string;CHOP:string;val:string):string;
+begin
+  result:=format('%d'#9'%s'#9'%s'#9'%s'#9'%s'#9'%s'#9'%s',[i,Naim,Tag,FieldLen,FSP,CHOP,val]);
+end;
 var
   Temp: string;
   i: integer;
+  naim:string;
 begin
   Temp := '';
   for i := 0 to SourceMmo.Lines.Count do
     Temp := Temp + SourceMmo.Lines[i];
   Rec := TMekofRecord.Create(Temp);
+
+
+  memo1.Clear;
+  MarkerMmo.Lines.Add('Позиции'#9'Длина'#9'Текст'#9'Описание');
+  for i := 0 to 11 do
+  begin
+    Memo1.Lines.Add(MakeDefString(MarkerPos[i], rec.Marker[i],
+    MarkerFullDef[i]));
+  end;
+  memo1.Lines.Add(#13#10#9'СПРАВОЧНИК:');
+  memo1.Lines.Add('Текст'#9'Описание');
+  memo1.Lines.Add(inttostr(rec.Fields.TermDefinition.TagLength)+#9+ReferenceDef[0]);
+  memo1.Lines.Add(inttostr(rec.Fields.TermDefinition.FieldLength)+#9+ReferenceDef[1]);
+  memo1.Lines.Add(inttostr(rec.Fields.TermDefinition.FirstSymbolPosLength)+#9+ReferenceDef[2]);
+  memo1.Lines.Add(inttostr(rec.Fields.TermDefinition.ChopLength)+#9+ReferenceDef[3]);
+  memo1.Lines.Add('№пп'#9'Наименование'#9'Метка'#9'ЧОП'#9'ПНС'#9'ДПД'#9'Значение');
+  ReferenceList.Clear;
+  for I := 0 to rec.Fields.Length - 1 do
+  begin
+  with rec.Fields.Fields[i].Description do
+    memo1.Lines.Add(GetTerm(i+1,naim,Tag,CHOP,inttostr(StartPos),inttostr(Length),rec.Fields.Fields[i].Value));
+    ReferenceList.Items.Add(rec.Fields.Fields[i].Description.GetSource);
+  end;
+
+//  memo1.Lines.Add(#13#10#9'ПОЛЯ:');
+//  memo1.Lines.Add('№пп'#9'Значение');
+//  for I := 0 to rec.Fields.Length - 1 do
+//  begin
+//    memo1.Lines.Add(inttostr(i+1)+#9+rec.Fields.Fields[i].Value);
+//  end;
 end;
 
 procedure TMainForm.ParseBtnClick(Sender: TObject);
-  function MakeDefString(MarkerPos: String; MarkerPart: string;
-    MarkerFullDef: string): string;
-  begin
-    Result := format('[%s]'#9'[%d]'#9#39'%s'#39#9'%s',
-      [MarkerPos, Length(MarkerPart), MarkerPart, MarkerFullDef]);
-  end;
 
 var
   s: string;
@@ -253,9 +347,12 @@ var
   ReferenceLen: integer;
   Reference: string;
   TermLength: integer;
+  DataFieldLength:integer;
+  FirstCharPosLength:integer;
+  UsePartLength   :integer;
 begin
-  { s := SourceMmo.Text;
-    // Marker := ParseMarker(copy(s, 1, 24));
+   s := SourceMmo.Text;
+     Marker := ParseMarker(copy(s, 1, 24));
     MarkerMmo.Lines.Add('Позиции'#9'Длина'#9'Текст'#9'Описание');
     for i := 0 to 11 do
     begin
@@ -276,7 +373,23 @@ begin
     begin
     ReferenceList.Items.Add(copy(Reference, i, TermLength));
     i := i + TermLength;
-    end; }
+    end;
+end;
+
+procedure TMainForm.BitBtn1Click(Sender: TObject);
+var
+  fl:textfile;
+  s:string;
+begin
+if  SaveDialog1.Execute() then
+begin
+  s := memo1.Text;
+  AssignFile(fl,SaveDialog1.FileName);
+  Rewrite(fl);
+  Write(fl,s);
+  CloseFile(fl);
+end;
+
 end;
 
 procedure TMainForm.Button1Click(Sender: TObject);
@@ -291,35 +404,30 @@ begin
 end;
 
 procedure TMainForm.ReferenceListClick(Sender: TObject);
-
 var
   ind: integer;
   article: string;
 begin
-  { ReferenceMemo.Clear();
+   ReferenceMemo.Clear();
     article := ReferenceList.Items[ReferenceList.ItemIndex];
     ind := 1;
     ReferenceMemo.Lines.Add('Длина'#9'Параметр'#9'Описание');
-    ReferenceMemo.Lines.Add(ReferenceRep(3, copy(article, 1, 3), 'Метка'));
+    ReferenceMemo.Lines.Add(ReferenceRep(3, copy(article, 1, 3), ReferenceDef[0]));
     ind := ind + 3;
-    ReferenceMemo.Lines.Add(ReferenceRep(DataFieldLength, copy(article, ind,
-    DataFieldLength),
-    'длина поля данных  - определяется: 1) общим количеством символов (включая индикатор и разделитель поля) в поле данных, идентифицируемом данной меткой, или 2) нулем, обозначающим, что данная статья справочника относится к полю данных, общая длина котор'
-    + 'орого превышает наибольшее допустимое десятичное число (n), которое может содержаться в компоненте "длина поля данных" статьи справочника. В таком случае поле данных рассматривается как разделенное на несколько частей, длина каждой из которых, за исключен'
-    + 'ием последней, равна n. Каждая часть имеет свою статью справочника, содержащую "метку", и "часть, определяемую при применении" поля данных, а также "позицию начального символа" той части, к которой относится эта статья справочника. Нулевое значение длины '
-    + 'поля данных означает, что данная статья адресуется к той части поля данных, которая не является последней, а ее длина равна n; или 3) количеством символов (включая разделитель поля) в последней части поля данных, описанного в п.2. В случаях, описанных'
-    + ' в пп. 2 и 3, все статьи справочника, относящиеся к частям одного и того же поля данных, должны следовать друг за другом в той же последовательности, что и сами части поля данных;')
+
+    ReferenceMemo.Lines.Add(ReferenceRep(rec.Fields.TermDefinition.FieldLength, copy(article, ind,
+    rec.Fields.TermDefinition.FieldLength),
+ReferenceDef[1])
     );
-    ind := ind + DataFieldLength;
-    ReferenceMemo.Lines.Add(ReferenceRep(FirstCharPosLength, copy(article, ind,
-    FirstCharPosLength),
-    'позиция начального символа - десятичное число, определяющее позицию первого символа поля данных, идентифицируемого предшествующей меткой, относительно базового адреса данных (позиция начального символа первого поля данных, следующего непосредственно за сп'
-    + 'справочником, равна нулю); '));
-    ind := ind + FirstCharPosLength;
-    ReferenceMemo.Lines.Add(ReferenceRep(UsePartLength, copy(article, ind,
-    UsePartLength),
-    'часть, определяемая при применении (ЧОП) - предназначена для представления дополнительной информации, относящейся к полю данных, идентифицируемому этой статьей справочника. ')
-    ); }
+    ind := ind + rec.Fields.TermDefinition.FieldLength;
+    ReferenceMemo.Lines.Add(ReferenceRep(rec.Fields.TermDefinition.FirstSymbolPosLength, copy(article, ind,
+    rec.Fields.TermDefinition.FirstSymbolPosLength),
+    ReferenceDef[2]));
+    ind := ind + rec.Fields.TermDefinition.FirstSymbolPosLength;
+    ReferenceMemo.Lines.Add(ReferenceRep(rec.Fields.TermDefinition.ChopLength, copy(article, ind,
+    rec.Fields.TermDefinition.ChopLength),
+    ReferenceDef[3])
+    );
 end;
 {$ENDREGION}
 

@@ -132,7 +132,7 @@ object MainForm: TMainForm
   end
   object ReferenceList: TListBox
     Left = 239
-    Top = 248
+    Top = 251
     Width = 217
     Height = 301
     Anchors = [akLeft, akTop, akBottom]
@@ -144,22 +144,47 @@ object MainForm: TMainForm
     Left = 239
     Top = 576
     Width = 217
-    Height = 165
+    Height = 171
     Anchors = [akLeft, akTop, akBottom]
     ScrollBars = ssHorizontal
     TabOrder = 3
     WordWrap = False
+  end
+  object Memo1: TMemo
+    Left = 462
+    Top = 264
+    Width = 468
+    Height = 483
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    ParentShowHint = False
+    ScrollBars = ssBoth
+    ShowHint = False
+    TabOrder = 4
+  end
+  object BitBtn1: TBitBtn
+    Left = 855
+    Top = 239
+    Width = 75
+    Height = 25
+    Caption = 'Save'
+    TabOrder = 5
+    OnClick = BitBtn1Click
   end
   object MainMenu1: TMainMenu
     Left = 192
     Top = 24
     object ParseBtn: TMenuItem
       Caption = 'Parse'
+      Enabled = False
       OnClick = ParseBtnClick
     end
     object LoadStructBtn: TMenuItem
       Caption = 'LoadStruct'
       OnClick = LoadStructBtnClick
     end
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 888
+    Top = 712
   end
 end
