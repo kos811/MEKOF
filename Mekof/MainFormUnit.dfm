@@ -12,31 +12,25 @@ object MainForm: TMainForm
   Font.Style = []
   Menu = MainMenu1
   OldCreateOrder = False
-  DesignSize = (
-    934
-    755)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
-    Left = 243
-    Top = 232
-    Width = 60
-    Height = 13
-    Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082
-  end
   object Label2: TLabel
-    Left = 243
-    Top = 0
-    Width = 107
+    Left = 0
+    Top = 113
+    Width = 934
     Height = 13
+    Align = alTop
     Caption = #1052#1072#1088#1082#1077#1088' '#1080' '#1077#1075#1086' '#1088#1072#1079#1073#1086#1088
+    ExplicitLeft = 4
+    ExplicitTop = 235
+    ExplicitWidth = 107
   end
   object SourceMmo: TMemo
     Left = 0
     Top = 0
-    Width = 233
-    Height = 755
-    Align = alLeft
+    Width = 934
+    Height = 113
+    Align = alTop
     Lines.Strings = (
       '02221131001200475 004530'
       '0010024000000010740010000240011'
@@ -122,44 +116,13 @@ object MainForm: TMainForm
     TabOrder = 0
   end
   object MarkerMmo: TMemo
-    Left = 240
-    Top = 16
-    Width = 701
-    Height = 217
-    Anchors = [akLeft, akTop, akRight]
+    Left = 0
+    Top = 126
+    Width = 934
+    Height = 179
+    Align = alTop
     ScrollBars = ssHorizontal
     TabOrder = 1
-  end
-  object ReferenceList: TListBox
-    Left = 239
-    Top = 251
-    Width = 217
-    Height = 301
-    Anchors = [akLeft, akTop, akBottom]
-    ItemHeight = 13
-    TabOrder = 2
-    OnClick = ReferenceListClick
-  end
-  object ReferenceMemo: TMemo
-    Left = 239
-    Top = 576
-    Width = 217
-    Height = 171
-    Anchors = [akLeft, akTop, akBottom]
-    ScrollBars = ssHorizontal
-    TabOrder = 3
-    WordWrap = False
-  end
-  object Memo1: TMemo
-    Left = 462
-    Top = 264
-    Width = 468
-    Height = 483
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    ParentShowHint = False
-    ScrollBars = ssBoth
-    ShowHint = False
-    TabOrder = 4
   end
   object BitBtn1: TBitBtn
     Left = 855
@@ -167,24 +130,96 @@ object MainForm: TMainForm
     Width = 75
     Height = 25
     Caption = 'Save'
-    TabOrder = 5
+    TabOrder = 2
     OnClick = BitBtn1Click
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 305
+    Width = 265
+    Height = 450
+    Align = alLeft
+    TabOrder = 3
+    ExplicitTop = 343
+    ExplicitHeight = 412
+    object Label1: TLabel
+      Left = 1
+      Top = 1
+      Width = 263
+      Height = 13
+      Align = alTop
+      Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082
+      ExplicitLeft = 171
+      ExplicitTop = 276
+      ExplicitWidth = 60
+    end
+    object ReferenceList: TListBox
+      Left = 1
+      Top = 14
+      Width = 263
+      Height = 435
+      Align = alClient
+      ItemHeight = 13
+      TabOrder = 0
+      OnClick = ReferenceListClick
+      ExplicitLeft = 40
+      ExplicitTop = 28
+      ExplicitWidth = 217
+      ExplicitHeight = 301
+    end
+  end
+  object Panel2: TPanel
+    Left = 265
+    Top = 305
+    Width = 669
+    Height = 450
+    Align = alClient
+    TabOrder = 4
+    ExplicitLeft = 584
+    ExplicitTop = 368
+    ExplicitWidth = 281
+    ExplicitHeight = 249
+    object ReferenceMemo: TMemo
+      Left = 1
+      Top = 1
+      Width = 667
+      Height = 120
+      Align = alTop
+      ScrollBars = ssHorizontal
+      TabOrder = 0
+      WordWrap = False
+    end
+    object Memo1: TMemo
+      Left = 1
+      Top = 121
+      Width = 667
+      Height = 328
+      Align = alClient
+      ParentShowHint = False
+      ScrollBars = ssBoth
+      ShowHint = False
+      TabOrder = 1
+      ExplicitLeft = -89
+      ExplicitTop = 54
+      ExplicitWidth = 370
+      ExplicitHeight = 195
+    end
   end
   object MainMenu1: TMainMenu
     Left = 192
     Top = 24
     object ParseBtn: TMenuItem
       Caption = 'Parse'
-      Enabled = False
+      Visible = False
       OnClick = ParseBtnClick
     end
     object LoadStructBtn: TMenuItem
       Caption = 'LoadStruct'
       OnClick = LoadStructBtnClick
     end
-  end
-  object SaveDialog1: TSaveDialog
-    Left = 888
-    Top = 712
+    object SaveToFile1: TMenuItem
+      Caption = 'ShowReport'
+      OnClick = SaveToFile1Click
+    end
   end
 end

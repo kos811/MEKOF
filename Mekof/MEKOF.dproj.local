@@ -1,2 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject/>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2014.03.25 10:41:08.956,=D:\!GitHub\MEKOF\Mekof\Unit1.pas</Transaction>
+    <Transaction>2014.03.25 10:41:38.983,D:\!GitHub\MEKOF\Mekof\ReportFormUnit.dfm=D:\!GitHub\MEKOF\Mekof\Unit1.dfm</Transaction>
+    <Transaction>2014.03.25 10:41:38.983,D:\!GitHub\MEKOF\Mekof\ReportFormUnit.pas=D:\!GitHub\MEKOF\Mekof\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>
