@@ -18,11 +18,20 @@ object ReportForm: TReportForm
     Left = 0
     Top = 0
     Width = 812
-    Height = 562
-    Align = alClient
+    Height = 305
+    Align = alTop
     ScrollBars = ssBoth
     TabOrder = 0
     WordWrap = False
+  end
+  object StringGrid1: TStringGrid
+    Left = 0
+    Top = 305
+    Width = 812
+    Height = 257
+    Align = alClient
+    FixedCols = 0
+    TabOrder = 1
   end
   object MainMenu1: TMainMenu
     Left = 200
@@ -35,9 +44,17 @@ object ReportForm: TReportForm
       Caption = 'WordWrap'
       OnClick = WordWrap1Click
     end
+    object XML1: TMenuItem
+      Caption = 'XML'
+    end
   end
   object SaveDialog1: TSaveDialog
     Left = 784
     Top = 534
+  end
+  object XMLDocument1: TXMLDocument
+    Left = 432
+    Top = 88
+    DOMVendorDesc = 'MSXML'
   end
 end

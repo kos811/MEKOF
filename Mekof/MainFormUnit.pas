@@ -63,20 +63,23 @@ type
     Length: integer;
     StartPos: integer;
     Chop: string;
+    function GetNaim(): string;
+    property Naim: string read GetNaim;
     function GetSource: string;
     Constructor Create(Def: string; DefAlloc: TMekofTermDef);
   end;
 
 type
   TMekofField = class(TObject)
-  private    
+  private
     Source: string;
     function GetIndicator(): string;
+    function GetIdentificator(): TStringList;
     function GetValues(): TStringList;
   public
     Description: TMekofFieldDef;
-    Identificator: string;
-    property Value: string read Source;
+    property Identificator: TStringList Read GetIdentificator;
+    // property Value: string read Source;
     property Values: TStringList Read GetValues;
     property Indicator: string Read GetIndicator;
     Constructor Create(Description: TMekofFieldDef; Value: string);
@@ -191,6 +194,7 @@ begin
   Result[10] := copy(Marker, 23, 1);
   Result[11] := copy(Marker, 24, 1);
 end;
+
 {$ENDREGION}
 {$REGION 'Mekof methods'}
 {$REGION 'TMekofTermDef'}
@@ -227,28 +231,54 @@ end;
 
 function TMekofField.GetIndicator(): string;
 begin
-  {if self.Description.Tag <> '001' then  
-  if self.Source[1] <> '+' then   
-    Result := copy(self.Source, 1, strtoint(Rec.Marker[10]))
-    else
-    result := 'E'
-  else  }
-  result := '___'
+  Result := self.Source[1];
+  if Description.Tag = '001' then
+    Result := ''
+    // if self.Source[1] <> '+' then
+    // Result := copy(self.Source, 1, strtoint(Rec.Marker[10]))
+
+end;
+
+function TMekofField.GetIdentificator(): TStringList;
+var
+  temp: string;
+  val: string;
+  p, p2: integer;
+begin
+  Result := TStringList.Create();
+  temp := Source;
+  while pos('+', temp) > 0 do
+  begin
+    p := pos('+', temp);
+    delete(temp, 1, p);
+    val := temp[1];
+    Result.Add(val);
+  end;
+  if Description.Tag = '001' then
+    Result.Add('')
+    // Result := '___'
 end;
 
 function TMekofField.GetValues(): TStringList;
 var
   temp: string;
-  p: integer;
+  val: string;
+  p, p2: integer;
 begin
   Result := TStringList.Create();
   temp := Source;
   while pos('+', temp) > 0 do
-    begin
-      p := pos('+', temp);
-      delete(temp, p, 1);
-      Result.Add(copy(self.Source, p, pos('+', temp) - p - 1));
-    end;
+  begin
+    p := pos('+', temp);
+    delete(temp, 1, p);
+    p := pos('+', temp);
+    if p = 0 then
+      p := Length(temp) + 1;
+    val := copy(temp, 2, p - 2);
+    Result.Add(val);
+  end;
+  if self.Description.Tag = '001' then
+    Result.Add(Source);
 end;
 
 Constructor TMekofRecord.Create(SourceText: string);
@@ -286,18 +316,69 @@ begin
   TermCount := Ceil(Reference.Length / TermDef.TermLength);
   SetLength(self.Fields, TermCount);
   for i := 0 to TermCount - 1 do
-    begin
-      temp := copy(Reference, TermDef.TermLength * i + 1, TermDef.TermLength);
-      MekofFieldDef := TMekofFieldDef.Create(temp, TermDefinition);
-      temp := copy(DataText, MekofFieldDef.StartPos + 1,
-        MekofFieldDef.Length - 1);
-      self.Fields[i] := TMekofField.Create(MekofFieldDef, temp);
-    end;
+  begin
+    temp := copy(Reference, TermDef.TermLength * i + 1, TermDef.TermLength);
+    MekofFieldDef := TMekofFieldDef.Create(temp, TermDefinition);
+    temp := copy(DataText, MekofFieldDef.StartPos + 1,
+      MekofFieldDef.Length - 1);
+    self.Fields[i] := TMekofField.Create(MekofFieldDef, temp);
+  end;
 end;
 
 function TMekofFieldList.GetLength(): integer;
 begin
   Result := System.Length(Fields);
+end;
+
+function TMekofFieldDef.GetNaim(): string;
+begin
+  case strtoint(Tag) of
+    001:
+      Result := 'Идентификатор подзаписи';
+    002:
+      Result := 'Указатель подзаписей';
+    004:
+      Result := 'Обозначение внешней базы данных';
+    005:
+      Result := 'Обозначение заимствованной записи 010 - ISBN';
+    011:
+      Result := 'ISSN';
+    100:
+      Result := 'Системные данные';
+    101:
+      Result := 'Язык документа';
+    102:
+      Result := 'Физическая форма документа';
+    200:
+      Result := 'Заглавие и сведения об авторстве';
+    201:
+      Result := 'Параллельное заглавие';
+    206:
+      Result := 'Нумерация и дата сериального издания';
+    210:
+      Result := 'Выходные данные';
+    600:
+      Result := 'УДК';
+    610:
+      Result := 'МКИ';
+    620:
+      Result := 'Рубрикатор';
+    630:
+      Result := 'Тезаурус';
+    640:
+      Result := 'Ключевое слово';
+    650:
+      Result := 'Текст документа';
+    660:
+      Result := 'Реферат (аннотация)';
+    670:
+      Result := 'Предметная рубрика';
+    700:
+      Result := 'Лицо с первичной интеллектуальной ответственностью';
+    905:
+      Result := 'Хранение документаэж';
+  end;
+
 end;
 
 function TMekofFieldDef.GetSource: string;
@@ -335,10 +416,6 @@ end;
 {$ENDREGION}
 {$REGION 'TForm1 Methods'}
 
-function GetNaim(key: string): string;
-begin
-end;
-
 procedure TMainForm.LoadStructBtnClick(Sender: TObject);
   function GetTerm(i: integer; Naim: string; Tag: string; Chop: string;
     Indicator: string; Identificator: string; FSP: string; FieldLen: string;
@@ -361,10 +438,10 @@ begin
   Memo1.Clear;
   MarkerMmo.Lines.Add('Позиции'#9'Длина'#9'Текст'#9'Описание');
   for i := 0 to 11 do
-    begin
-      MarkerMmo.Lines.Add(MakeDefString(MarkerPos[i], Rec.Marker[i],
-        MarkerFullDef[i]));
-    end;
+  begin
+    MarkerMmo.Lines.Add(MakeDefString(MarkerPos[i], Rec.Marker[i],
+      MarkerFullDef[i]));
+  end;
   Memo1.Lines.Add(#13#10#9'СПРАВОЧНИК:');
   Memo1.Lines.Add('Текст'#9'Описание');
   Memo1.Lines.Add(inttostr(Rec.Fields.TermDefinition.TagLength) + #9 +
@@ -384,16 +461,15 @@ begin
   ReferenceList.Clear;
   for i := 0 to Rec.Fields.Length - 1 do
     with Rec.Fields.Fields[i].Description do
+    begin
+      for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
       begin
-        for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
-          begin
-          Naim := '-';
-            Memo1.Lines.Add(GetTerm(i + 1, Naim, Tag, Chop,
-              Rec.Fields.Fields[i].Indicator,
-              Rec.Fields.Fields[i].Identificator, inttostr(StartPos),
-              inttostr(Length), Rec.Fields.Fields[i].Values[j]));
-          end;
+        Memo1.Lines.Add(GetTerm(i + 1, Naim, Tag, Chop,
+          Rec.Fields.Fields[i].Indicator, Rec.Fields.Fields[i].Identificator[j],
+          inttostr(StartPos), inttostr(Length),
+          Rec.Fields.Fields[i].Values[j]));
       end;
+    end;
 
   // memo1.Lines.Add(#13#10#9'ПОЛЯ:');
   // memo1.Lines.Add('№пп'#9'Значение');
@@ -420,10 +496,10 @@ begin
   Marker := ParseMarker(copy(s, 1, 24));
   MarkerMmo.Lines.Add('Позиции'#9'Длина'#9'Текст'#9'Описание');
   for i := 0 to 11 do
-    begin
-      MarkerMmo.Lines.Add(MakeDefString(MarkerPos[i], Marker[i],
-        MarkerFullDef[i]));
-    end;
+  begin
+    MarkerMmo.Lines.Add(MakeDefString(MarkerPos[i], Marker[i],
+      MarkerFullDef[i]));
+  end;
   ReferenceLen := strtoint(Marker[5]) + 5;
   Reference := copy(s, 25, ReferenceLen);
   Reference := ClearCLRFText(Reference);
@@ -435,10 +511,10 @@ begin
   ReferenceList.Clear();
   i := 1;
   while i < ReferenceLen do
-    begin
-      ReferenceList.Items.Add(copy(Reference, i, TermLength));
-      i := i + TermLength;
-    end;
+  begin
+    ReferenceList.Items.Add(copy(Reference, i, TermLength));
+    i := i + TermLength;
+  end;
 end;
 
 procedure TMainForm.BitBtn1Click(Sender: TObject);
@@ -493,11 +569,11 @@ var
   RepForm: TReportForm;
 begin
   if Rec = nil then
-    begin
-      for i := 0 to SourceMmo.Lines.Count do
-        temp := temp + SourceMmo.Lines[i];
-      Rec := TMekofRecord.Create(temp);
-    end;
+  begin
+    for i := 0 to SourceMmo.Lines.Count do
+      temp := temp + SourceMmo.Lines[i];
+    Rec := TMekofRecord.Create(temp);
+  end;
   RepForm := TReportForm.Create(self);
   RepForm.showRep(Rec);
 end;

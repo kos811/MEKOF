@@ -21,8 +21,6 @@ object MainForm: TMainForm
     Height = 13
     Align = alTop
     Caption = #1052#1072#1088#1082#1077#1088' '#1080' '#1077#1075#1086' '#1088#1072#1079#1073#1086#1088
-    ExplicitLeft = 4
-    ExplicitTop = 235
     ExplicitWidth = 107
   end
   object SourceMmo: TMemo
@@ -140,8 +138,6 @@ object MainForm: TMainForm
     Height = 450
     Align = alLeft
     TabOrder = 3
-    ExplicitTop = 343
-    ExplicitHeight = 412
     object Label1: TLabel
       Left = 1
       Top = 1
@@ -149,8 +145,6 @@ object MainForm: TMainForm
       Height = 13
       Align = alTop
       Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082
-      ExplicitLeft = 171
-      ExplicitTop = 276
       ExplicitWidth = 60
     end
     object ReferenceList: TListBox
@@ -162,10 +156,6 @@ object MainForm: TMainForm
       ItemHeight = 13
       TabOrder = 0
       OnClick = ReferenceListClick
-      ExplicitLeft = 40
-      ExplicitTop = 28
-      ExplicitWidth = 217
-      ExplicitHeight = 301
     end
   end
   object Panel2: TPanel
@@ -175,10 +165,6 @@ object MainForm: TMainForm
     Height = 450
     Align = alClient
     TabOrder = 4
-    ExplicitLeft = 584
-    ExplicitTop = 368
-    ExplicitWidth = 281
-    ExplicitHeight = 249
     object ReferenceMemo: TMemo
       Left = 1
       Top = 1
@@ -199,10 +185,6 @@ object MainForm: TMainForm
       ScrollBars = ssBoth
       ShowHint = False
       TabOrder = 1
-      ExplicitLeft = -89
-      ExplicitTop = 54
-      ExplicitWidth = 370
-      ExplicitHeight = 195
     end
   end
   object MainMenu1: TMainMenu
