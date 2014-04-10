@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Menus, StdCtrls, Math, Vcl.Buttons, Vcl.ExtCtrls;
+  Menus, StdCtrls, Math, Vcl.Buttons, Vcl.ExtCtrls,Excel_TLB;
 
 {$REGION 'TForm1'}
 

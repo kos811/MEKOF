@@ -6,20 +6,29 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Menus, MainFormUnit,
-  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.Grids;
+  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc, Vcl.Grids,
+  Vcl.ExtCtrls, Vcl.ComCtrls, ComObj, Excel_TLB;
 
 type
   TReportForm = class(TForm)
     MainMenu1: TMainMenu;
     SaveToFile1: TMenuItem;
-    Memo1: TMemo;
     SaveDialog1: TSaveDialog;
     WordWrap1: TMenuItem;
     XMLDocument1: TXMLDocument;
     XML1: TMenuItem;
+    TreeView1: TTreeView;
+    Panel1: TPanel;
+    Memo1: TMemo;
     StringGrid1: TStringGrid;
+    Splitter1: TSplitter;
+    Splitter2: TSplitter;
+    ExportToExcel1: TMenuItem;
     procedure SaveToFile1Click(Sender: TObject);
     procedure WordWrap1Click(Sender: TObject);
+    procedure LoadItems(TreeNode: TTreeNode; Node: IXMLNode);
+    procedure ExportToExcel1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     Rec: TMekofRecord;
@@ -30,10 +39,66 @@ type
 
 var
   ReportForm: TReportForm;
+  excel: variant; // Переменная в которой создаётся объект EXCEL
 
 implementation
 
 {$R *.dfm}
+
+procedure TReportForm.ExportToExcel1Click(Sender: TObject);
+var
+  i, j: integer;
+  temp: string;
+begin
+  try
+    excel := CreateOleObject('Excel.Application');
+    excel.DisplayAlerts := false;
+    excel.WorkBooks.Add;
+    // excel.WorkBooks.Open(GetCurrentDir() + '\отчет.xls');
+    excel.WorkBooks[1].WorkSheets[1].Name := 'Отчет1';
+    for i := 0 to StringGrid1.RowCount - 1 do
+      for j := 0 to StringGrid1.ColCount - 1 do
+      begin
+        temp := StringGrid1.Cells[j, i];
+        excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Value := temp;
+//        excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].HorizontalAlignment
+//          := xlLeft;
+//        excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].VerticalAligment := xlTop;
+        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Borders
+        // [xlInsideVertical].Weight := xlMedium;
+      end;
+    excel.Visible := true;
+  finally
+  end;
+end;
+
+procedure TReportForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  excel.WorkBooks.Close;
+
+  // закрываем Excel
+  excel.Application.quit;
+end;
+
+procedure TReportForm.LoadItems(TreeNode: TTreeNode; Node: IXMLNode);
+var
+  i: integer;
+  str: string;
+begin
+  str := Node.NodeName;
+  if Node.NodeName <> '#text' then
+  begin
+    TreeNode := TreeView1.Items.AddChild(TreeNode, str);
+    TreeNode.HasChildren := Node.HasChildNodes;
+    if (Node.ChildNodes.IndexOf('#text') > -1) and (Node.ChildNodes.Count = 1)
+    then
+      TreeNode.HasChildren := false;
+    if TreeNode.HasChildren then
+      for i := 0 to Node.ChildNodes.Count - 1 do
+        LoadItems(TreeNode, Node.ChildNodes.Nodes[i]);
+  end;
+
+end;
 
 function GetNaim(Code: integer): string;
 begin
@@ -107,13 +172,13 @@ var
   RootNode: Xml.XMLIntf.IXMLNode;
   FieldNode: Xml.XMLIntf.IXMLNode;
   ValNode: Xml.XMLIntf.IXMLNode;
-  Temp: string;
+  temp: string;
   i, j, l: integer;
   Naim: string;
   delim: string;
 begin
   Rec := aRec;
-  Temp := '';
+  temp := '';
 
   Memo1.Clear;
   Memo1.Lines.Add('Позиции'#9'Длина'#9'Текст'#9'Описание');
@@ -164,7 +229,7 @@ begin
         if i > 0 then
           StringGrid1.RowCount := StringGrid1.RowCount + 1;
         l := StringGrid1.RowCount - 1;
-        Temp := Rec.Fields.Fields[i].Values[j];
+        temp := Rec.Fields.Fields[i].Values[j];
         if j < 1 then
         begin
           StringGrid1.Cells[0, l] := inttostr(i + 1);
@@ -188,7 +253,7 @@ begin
 
       end;
     end;
-  //StringGrid1.
+  // StringGrid1.
   XMLDocument1.Active := true;
   RootNode := XMLDocument1.AddChild('Record');
   for i := 0 to Rec.Fields.Length - 1 do
@@ -206,6 +271,8 @@ begin
 
   Memo1.Text := Memo1.Text + XMLDocument1.Xml.Text;
   XMLDocument1.SaveToFile('LastXML.xml');
+  // XMLDocument1.documentElement;
+  LoadItems(nil, XMLDocument1.documentElement);
   self.Show();
 end;
 
