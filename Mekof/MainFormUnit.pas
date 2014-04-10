@@ -152,6 +152,16 @@ uses ReportFormUnit;
 {$R *.DFM}
 {$REGION 'NoClass Methods'}
 
+function AddLeftZeros(int: integer; len: integer): string;
+var
+  s: string;
+begin
+  s := inttostr(int);
+  while System.Length(s) < len do
+    s := '0' + s;
+  Result := s;
+end;
+
 function MakeDefString(MarkerPos: String; MarkerPart: string;
   MarkerFullDef: string): string;
 begin
@@ -167,6 +177,7 @@ end;
 
 function ReferenceRep(len: integer; Text: string; capt: string): string;
 begin
+
   Result := format('%d'#9'%s'#9'%s', [len, Text, capt]);
 end;
 
@@ -382,20 +393,12 @@ begin
 end;
 
 function TMekofFieldDef.GetSource: string;
-  function MakeLen(int: integer; len: integer): string;
-  var
-    s: string;
-  begin
-    while System.Length(s) < len do
-      s := '0' + s;
-    Result := s;
-  end;
 
 var
   len, PNS: string;
 begin
-  len := MakeLen(Length, Rec.Fields.TermDefinition.TagLength);
-  PNS := MakeLen(StartPos, Rec.Fields.TermDefinition.FirstSymbolPosLength);
+  len := AddLeftZeros(Length, Rec.Fields.TermDefinition.FieldLength);
+  PNS := AddLeftZeros(StartPos, Rec.Fields.TermDefinition.FirstSymbolPosLength);
   Result := Tag + ' ' + len + ' ' + PNS + ' ' + Chop;
 end;
 
@@ -460,6 +463,8 @@ begin
   // ('№пп'#9'Наименование'#9'Метка'#9'ЧОП'#9'ПНС'#9'ДПД'#9'Значение');
   ReferenceList.Clear;
   for i := 0 to Rec.Fields.Length - 1 do
+  begin
+    ReferenceList.Items.Add(Rec.Fields.Fields[i].Description.GetSource());
     with Rec.Fields.Fields[i].Description do
     begin
       for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
@@ -470,6 +475,7 @@ begin
           Rec.Fields.Fields[i].Values[j]));
       end;
     end;
+  end;
 
   // memo1.Lines.Add(#13#10#9'ПОЛЯ:');
   // memo1.Lines.Add('№пп'#9'Значение');
@@ -540,26 +546,29 @@ procedure TMainForm.ReferenceListClick(Sender: TObject);
 var
   ind: integer;
   article: string;
+  tmp: string;
 begin
   ReferenceMemo.Clear();
-  article := ReferenceList.Items[ReferenceList.ItemIndex];
+  article := stringreplace(ReferenceList.Items[ReferenceList.ItemIndex], ' ',
+    '', [rfreplaceall]);
   ind := 1;
   ReferenceMemo.Lines.Add('Длина'#9'Параметр'#9'Описание');
-  ReferenceMemo.Lines.Add(ReferenceRep(3, copy(article, 1, 3),
-    ReferenceDef[0]));
+  tmp := copy(article, 1, 3);
+  ReferenceMemo.Lines.Add(ReferenceRep(3, tmp, ReferenceDef[0]));
   ind := ind + 3;
 
+  tmp := copy(article, ind, Rec.Fields.TermDefinition.FieldLength);
   ReferenceMemo.Lines.Add(ReferenceRep(Rec.Fields.TermDefinition.FieldLength,
-    copy(article, ind, Rec.Fields.TermDefinition.FieldLength),
-    ReferenceDef[1]));
+    tmp, ReferenceDef[1]));
   ind := ind + Rec.Fields.TermDefinition.FieldLength;
+  tmp := copy(article, ind, Rec.Fields.TermDefinition.FirstSymbolPosLength);
   ReferenceMemo.Lines.Add
-    (ReferenceRep(Rec.Fields.TermDefinition.FirstSymbolPosLength,
-    copy(article, ind, Rec.Fields.TermDefinition.FirstSymbolPosLength),
+    (ReferenceRep(Rec.Fields.TermDefinition.FirstSymbolPosLength, tmp,
     ReferenceDef[2]));
   ind := ind + Rec.Fields.TermDefinition.FirstSymbolPosLength;
+  tmp := copy(article, ind, Rec.Fields.TermDefinition.ChopLength);
   ReferenceMemo.Lines.Add(ReferenceRep(Rec.Fields.TermDefinition.ChopLength,
-    copy(article, ind, Rec.Fields.TermDefinition.ChopLength), ReferenceDef[3]));
+    tmp, ReferenceDef[3]));
 end;
 
 procedure TMainForm.SaveToFile1Click(Sender: TObject);

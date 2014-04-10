@@ -93,13 +93,14 @@ Procedure TReportForm.ShowRep(aRec: TMekofRecord);
     result := format('[%s]'#9'[%d]'#9#39'%s'#39#9'%s',
       [MarkerPos, Length(MarkerPart), MarkerPart, MarkerFullDef]);
   end;
-  function GetTerm(D:string; i: integer; Naim: string; Tag: string; Chop: string;
-    indicator: string; identificator: string; FSP: string; FieldLen: string;
-    val: string): string;
+  function GetTerm(D: string; i: integer; Naim: string; Tag: string;
+    Chop: string; indicator: string; identificator: string; FSP: string;
+    FieldLen: string; val: string): string;
   begin
-  //d - Delimeter
-    result := format('%d'+d+'%s'+d+'%s'+d+'%s'+d+'%s'+d+'%s'+d+'%s'+d+'%s'+d+'%s',
-      [i, Naim, Tag, Chop, indicator, identificator, FSP, FieldLen, val]);
+    // d - Delimeter
+    result := format('%d' + D + '%s' + D + '%s' + D + '%s' + D + '%s' + D + '%s'
+      + D + '%s' + D + '%s' + D + '%s', [i, Naim, Tag, Chop, indicator,
+      identificator, FSP, FieldLen, val]);
   end;
 
 var
@@ -135,9 +136,9 @@ begin
   for i := 0 to Rec.Fields.Length - 1 do
     Memo1.Lines.Add(Rec.Fields.Fields[i].Description.GetSource);
   StringGrid1.FixedCols := 0;
-  StringGrid1.Fixedrows := 1;
   StringGrid1.ColCount := 9;
-  StringGrid1.RowCount := 1;
+  StringGrid1.RowCount := 2;
+  StringGrid1.Fixedrows := 1;
   StringGrid1.ColWidths[8] := 500;
 
   StringGrid1.Cells[0, 0] := '№ п/п';
@@ -152,15 +153,16 @@ begin
 
   i := 0;
   delim := #9;
-  Memo1.Lines.Add ('№ п/п' + delim + 'Наименование Эл-та' + delim + 'Метка' + delim +
-    'ЧОП' + delim + 'Индикатор' + delim + 'Идентификатор' + delim + 'Адрес' + delim +
-    'Длина' + delim + 'Значение');
+  Memo1.Lines.Add('№ п/п' + delim + 'Наименование Эл-та' + delim + 'Метка' +
+    delim + 'ЧОП' + delim + 'Индикатор' + delim + 'Идентификатор' + delim +
+    'Адрес' + delim + 'Длина' + delim + 'Значение');
   for i := 0 to Rec.Fields.Length - 1 do
     with Rec.Fields.Fields[i] do
     begin
       for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
       begin
-        StringGrid1.RowCount := StringGrid1.RowCount + 1;
+        if i > 0 then
+          StringGrid1.RowCount := StringGrid1.RowCount + 1;
         l := StringGrid1.RowCount - 1;
         Temp := Rec.Fields.Fields[i].Values[j];
         if j < 1 then
@@ -170,16 +172,15 @@ begin
           StringGrid1.Cells[2, l] := Description.Tag;
           StringGrid1.Cells[3, l] := Description.Chop;
           StringGrid1.Cells[4, l] := indicator;
-          Memo1.Lines.Add(GetTerm(#9'|',i + 1, Description.Naim, Description.Tag,
-            Description.Chop, indicator, identificator[j],
+          Memo1.Lines.Add(GetTerm(#9'|', i + 1, Description.Naim,
+            Description.Tag, Description.Chop, indicator, identificator[j],
             inttostr(Description.StartPos), inttostr(Description.Length),
             Rec.Fields.Fields[i].Values[j]));
         end
         else
-          Memo1.Lines.Add(GetTerm(#9'|',i + 1, '', '',
-            '', '', identificator[j],
-            inttostr(Description.StartPos), inttostr(Description.Length),
-            Rec.Fields.Fields[i].Values[j]));
+          Memo1.Lines.Add(GetTerm(#9'|', i + 1, '', '', '', '',
+            identificator[j], inttostr(Description.StartPos),
+            inttostr(Description.Length), Rec.Fields.Fields[i].Values[j]));
         StringGrid1.Cells[5, l] := identificator[j];
         StringGrid1.Cells[6, l] := inttostr(Description.StartPos);
         StringGrid1.Cells[7, l] := inttostr(Description.Length);
@@ -187,7 +188,7 @@ begin
 
       end;
     end;
-
+  //StringGrid1.
   XMLDocument1.Active := true;
   RootNode := XMLDocument1.AddChild('Record');
   for i := 0 to Rec.Fields.Length - 1 do

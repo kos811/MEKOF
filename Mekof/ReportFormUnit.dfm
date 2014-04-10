@@ -31,6 +31,7 @@ object ReportForm: TReportForm
     Height = 257
     Align = alClient
     FixedCols = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goEditing, goTabs]
     TabOrder = 1
   end
   object MainMenu1: TMainMenu
