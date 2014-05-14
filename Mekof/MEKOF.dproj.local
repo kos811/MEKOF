@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.956,=D:\!GitHub\MEKOF\Mekof\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.078,=C:\Users\KMT.SFT2000\Documents\RAD Studio\12.0\Imports\Excel_TLB.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.983,D:\!GitHub\MEKOF\Mekof\ReportFormUnit.dfm=D:\!GitHub\MEKOF\Mekof\Unit1.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.983,D:\!GitHub\MEKOF\Mekof\ReportFormUnit.pas=D:\!GitHub\MEKOF\Mekof\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.983,D:\!GitHub\MEKOF\Mekof\Unit1.dfm=D:\!GitHub\MEKOF\Mekof\ReportFormUnit.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.956,=D:\!GitHub\MEKOF\Mekof\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.983,D:\!GitHub\MEKOF\Mekof\Unit1.pas=D:\!GitHub\MEKOF\Mekof\ReportFormUnit.pas</Transaction>
   </Transactions>
 </BorlandProject>

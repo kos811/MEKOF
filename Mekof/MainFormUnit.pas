@@ -366,7 +366,7 @@ end;
 
 function TMekofFieldDef.GetNaim(): string;
 begin
-  Result:=TmekofRecord(TMekofFieldList(TMekofField(Parent).Parent).Parent).Titles.DocumentElement.ChildNodes.Nodes[tag].NodeName;
+  //Result:=TmekofRecord(TMekofFieldList(TMekofField(Parent).Parent).Parent).Titles.DocumentElement.ChildNodes.Nodes[tag].NodeName;
   case strtoint(Tag) of
     001:
       Result := 'Идентификатор подзаписи';
