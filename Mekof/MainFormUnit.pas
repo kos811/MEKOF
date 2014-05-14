@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Menus, StdCtrls, Math, Vcl.Buttons, Vcl.ExtCtrls,Excel_TLB;
+  Menus, StdCtrls, Math, Vcl.Buttons, Vcl.ExtCtrls, Excel_TLB,
+  Xml.xmldom, Xml.XMLIntf, Xml.Win.msxmldom, Xml.XMLDoc;
 
 {$REGION 'TForm1'}
 
@@ -48,11 +49,12 @@ type
     FieldLength: integer;
     FirstSymbolPosLength: integer;
     ChopLength: integer;
+    Parent: TObject; // TMekofFieldList
     Function GetTermLength(): integer;
     Property TermLength: integer Read GetTermLength;
-    Constructor Create(TagLength: integer; FieldLength: integer;
-      FirstSymbolPos: integer; Chop: integer); Overload;
-    Constructor Create(TagLength: string; FieldLength: string;
+    Constructor Create(Parent: TObject; TagLength: integer;
+      FieldLength: integer; FirstSymbolPos: integer; Chop: integer); Overload;
+    Constructor Create(Parent: TObject; TagLength: string; FieldLength: string;
       FirstSymbolPos: string; Chop: string); Overload;
   end;
 
@@ -63,10 +65,11 @@ type
     Length: integer;
     StartPos: integer;
     Chop: string;
+    Parent: TObject; // TMekofField
     function GetNaim(): string;
     property Naim: string read GetNaim;
     function GetSource: string;
-    Constructor Create(Def: string; DefAlloc: TMekofTermDef);
+    Constructor Create(Parent: TObject; Def: string; DefAlloc: TMekofTermDef);
   end;
 
 type
@@ -78,11 +81,13 @@ type
     function GetValues(): TStringList;
   public
     Description: TMekofFieldDef;
+    Parent: TObject; // TMekofFieldList
     property Identificator: TStringList Read GetIdentificator;
     // property Value: string read Source;
     property Values: TStringList Read GetValues;
     property Indicator: string Read GetIndicator;
-    Constructor Create(Description: TMekofFieldDef; Value: string);
+    Constructor Create(Parent: TObject; Description: TMekofFieldDef;
+      Value: string);
   end;
 
 type
@@ -92,8 +97,10 @@ type
   public
     Fields: array of TMekofField;
     TermDefinition: TMekofTermDef;
+    Parent: TObject; // TMekofRecord
     property Length: integer read GetLength;
-    Constructor Create(Reference: string; TermDef: TMekofTermDef;
+    Constructor Create(Parent: TObject; Reference: string; TagLength: string;
+      FieldLength: string; FirstSymbolPos: string; Chop: string;
       DataText: String);
   end;
 
@@ -104,6 +111,7 @@ type
   public
     Marker: TMekofMarker;
     Fields: TMekofFieldList;
+    Titles: TXMLDocument;
     // Reference: TMekofReference;
     Constructor Create(SourceText: string);
   end;
@@ -210,9 +218,10 @@ end;
 {$REGION 'Mekof methods'}
 {$REGION 'TMekofTermDef'}
 
-Constructor TMekofTermDef.Create(TagLength: integer; FieldLength: integer;
-  FirstSymbolPos: integer; Chop: integer);
+Constructor TMekofTermDef.Create(Parent: TObject; TagLength: integer;
+  FieldLength: integer; FirstSymbolPos: integer; Chop: integer);
 begin
+  self.Parent := Parent;
   self.TagLength := TagLength;
   self.FieldLength := FieldLength;
   self.FirstSymbolPosLength := FirstSymbolPos;
@@ -224,9 +233,10 @@ begin
   Result := TagLength + FieldLength + FirstSymbolPosLength + ChopLength;
 end;
 
-Constructor TMekofTermDef.Create(TagLength: string; FieldLength: string;
-  FirstSymbolPos: string; Chop: string);
+Constructor TMekofTermDef.Create(Parent: TObject; TagLength: string;
+  FieldLength: string; FirstSymbolPos: string; Chop: string);
 begin
+  self.Parent := Parent;
   self.TagLength := strtoint(TagLength);
   self.FieldLength := strtoint(FieldLength);
   self.FirstSymbolPosLength := strtoint(FirstSymbolPos);
@@ -234,10 +244,12 @@ begin
 end;
 {$ENDREGION}
 
-Constructor TMekofField.Create(Description: TMekofFieldDef; Value: string);
+Constructor TMekofField.Create(Parent: TObject; Description: TMekofFieldDef;
+  Value: string);
 begin
   self.Description := Description;
   self.Source := Value;
+  self.Parent := Parent;
 end;
 
 function TMekofField.GetIndicator(): string;
@@ -275,20 +287,20 @@ var
   temp: string;
   val: string;
   p, p2: integer;
-  id:char;
+  id: char;
 begin
   Result := TStringList.Create();
   temp := Source;
   while pos('+', temp) > 0 do
   begin
     p := pos('+', temp);
-    id := temp[p+1];
+    id := temp[p + 1];
     delete(temp, 1, p);
     p := pos('+', temp);
     if p = 0 then
       p := Length(temp) + 1;
     val := copy(temp, 2, p - 2);
-    Result.Values[id]:=val;
+    Result.Values[id] := val;
   end;
   if self.Description.Tag = '001' then
     Result.Add(Source);
@@ -313,11 +325,17 @@ begin
   RefText := copy(SourceText, 25, i - 25);
   DataText := copy(SourceText, strtoint(Marker[5]) + 1,
     strtoint(Marker[0]) - strtoint(Marker[5]));
-  self.Fields := TMekofFieldList.Create(RefText, TMekofTermDef.Create('3',
-    Marker[8], Marker[9], Marker[10]), DataText);
+  self.Fields := TMekofFieldList.Create(self, RefText, '3', Marker[8],
+    Marker[9], Marker[10], DataText);
+  Titles := TXMLDocument.Create(nil);
+  if not FileExists('IdScheme.xml') then
+    ShowMessage('File not found! ("IdScheme.xml")')
+  else
+    Titles.LoadFromFile('IdScheme.xml');
 end;
 
-Constructor TMekofFieldList.Create(Reference: string; TermDef: TMekofTermDef;
+Constructor TMekofFieldList.Create(Parent: TObject; Reference: string;
+  TagLength: string; FieldLength: string; FirstSymbolPos: string; Chop: string;
   DataText: String);
 var
   i: integer;
@@ -325,16 +343,19 @@ var
   temp: string;
   MekofFieldDef: TMekofFieldDef;
 begin
-  TermDefinition := TermDef;
-  TermCount := Ceil(Reference.Length / TermDef.TermLength);
+  self.Parent := Parent;
+  TermDefinition := TMekofTermDef.Create(self, TagLength, FieldLength,
+    FirstSymbolPos, Chop);
+  TermCount := Ceil(Reference.Length / TermDefinition.TermLength);
   SetLength(self.Fields, TermCount);
   for i := 0 to TermCount - 1 do
   begin
-    temp := copy(Reference, TermDef.TermLength * i + 1, TermDef.TermLength);
-    MekofFieldDef := TMekofFieldDef.Create(temp, TermDefinition);
+    temp := copy(Reference, TermDefinition.TermLength * i + 1,
+      TermDefinition.TermLength);
+    MekofFieldDef := TMekofFieldDef.Create(self, temp, TermDefinition);
     temp := copy(DataText, MekofFieldDef.StartPos + 1,
       MekofFieldDef.Length - 1);
-    self.Fields[i] := TMekofField.Create(MekofFieldDef, temp);
+    self.Fields[i] := TMekofField.Create(self, MekofFieldDef, temp);
   end;
 end;
 
@@ -345,6 +366,7 @@ end;
 
 function TMekofFieldDef.GetNaim(): string;
 begin
+  Result:=TmekofRecord(TMekofFieldList(TMekofField(Parent).Parent).Parent).Titles.DocumentElement.ChildNodes.Nodes[tag].NodeName;
   case strtoint(Tag) of
     001:
       Result := 'Идентификатор подзаписи';
@@ -390,8 +412,8 @@ begin
       Result := 'Лицо с первичной интеллектуальной ответственностью';
     905:
       Result := 'Хранение документа';
-    else
-        result := 'Unknown';
+  else
+    Result := '';
   end;
 
 end;
@@ -406,10 +428,13 @@ begin
   Result := Tag + ' ' + len + ' ' + PNS + ' ' + Chop;
 end;
 
-Constructor TMekofFieldDef.Create(Def: string; DefAlloc: TMekofTermDef);
+Constructor TMekofFieldDef.Create(Parent: TObject; Def: string;
+  DefAlloc: TMekofTermDef
+  );
 var
   i: integer;
 begin
+  self.Parent := Parent;
   i := 1;
   self.Tag := copy(Def, i, DefAlloc.TagLength);
   i := i + DefAlloc.TagLength;
@@ -542,7 +567,7 @@ begin
   s := SourceMmo.Text;
   s := stringreplace(s, #13, '', [rfreplaceall]);
   s := stringreplace(s, #10, '', [rfreplaceall]);
-  showmessage(s[475]);
+  ShowMessage(s[475]);
   // memo1.Commatext;
 end;
 

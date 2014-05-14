@@ -142,11 +142,10 @@ object MainForm: TMainForm
     object Label1: TLabel
       Left = 1
       Top = 1
-      Width = 263
+      Width = 60
       Height = 13
       Align = alTop
       Caption = #1057#1087#1088#1072#1074#1086#1095#1085#1080#1082
-      ExplicitWidth = 60
     end
     object ReferenceList: TListBox
       Left = 1

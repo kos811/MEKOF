@@ -13,7 +13,6 @@ object ReportForm: TReportForm
   Menu = MainMenu1
   OldCreateOrder = False
   Position = poMainFormCenter
-  OnClose = FormClose
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter

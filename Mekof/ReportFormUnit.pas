@@ -28,7 +28,6 @@ type
     procedure WordWrap1Click(Sender: TObject);
     procedure LoadItems(TreeNode: TTreeNode; Node: IXMLNode);
     procedure ExportToExcel1Click(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
     Rec: TMekofRecord;
@@ -54,30 +53,16 @@ begin
     excel := CreateOleObject('Excel.Application');
     excel.DisplayAlerts := false;
     excel.WorkBooks.Add;
-    // excel.WorkBooks.Open(GetCurrentDir() + '\отчет.xls');
     excel.WorkBooks[1].WorkSheets[1].Name := 'Отчет1';
     for i := 0 to StringGrid1.RowCount - 1 do
       for j := 0 to StringGrid1.ColCount - 1 do
       begin
         temp := StringGrid1.Cells[j, i];
         excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Value := temp;
-        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].HorizontalAlignment
-        // := xlLeft;
-        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].VerticalAligment := xlTop;
-        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Borders
-        // [xlInsideVertical].Weight := xlMedium;
       end;
     excel.Visible := true;
   finally
   end;
-end;
-
-procedure TReportForm.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  excel.WorkBooks.Close;
-
-  // закрываем Excel
-  excel.Application.quit;
 end;
 
 procedure TReportForm.LoadItems(TreeNode: TTreeNode; Node: IXMLNode);
@@ -88,6 +73,10 @@ begin
   str := Node.NodeName;
   if Node.NodeName <> '#text' then
   begin
+    if Node.IsTextElement then
+      str := format('%s="%s"',[Node.NodeName, Node.Text]);
+//      str := str + '=' + Node.Text;
+
     TreeNode := TreeView1.Items.AddChild(TreeNode, str);
     TreeNode.HasChildren := Node.HasChildNodes;
     if (Node.ChildNodes.IndexOf('#text') > -1) and (Node.ChildNodes.Count = 1)
@@ -176,6 +165,7 @@ var
   i, j, l: integer;
   Naim: string;
   delim: string;
+  identificator: string;
 begin
   Rec := aRec;
   temp := '';
@@ -257,18 +247,21 @@ begin
   XMLDocument1.Active := true;
   RootNode := XMLDocument1.AddChild('Record');
   for i := 0 to Rec.Fields.Length - 1 do
+  begin
+    // FieldNode := RootNode.AddChild('Field');
+    // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
+    // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
+    Naim := StringReplace(Rec.Fields.Fields[i].Description.Naim, ' ', '_',
+      [rfReplaceAll]);
+    Naim := StringReplace(Naim, '(', '', [rfReplaceAll]);
+    Naim := StringReplace(Naim, ')', '', [rfReplaceAll]);
+    if Naim = '' then
+      Naim := 'Метка_' + Rec.Fields.Fields[i].Description.Tag;
+    FieldNode := RootNode.AddChild(Naim);
+    // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
+    // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
     for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
     begin
-      // FieldNode := RootNode.AddChild('Field');
-      // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
-      // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
-      Naim := StringReplace(Rec.Fields.Fields[i].Description.Naim, ' ', '_',
-        [rfReplaceAll]);
-      Naim := StringReplace(Naim, '(', '', [rfReplaceAll]);
-      Naim := StringReplace(Naim, ')', '', [rfReplaceAll]);
-      FieldNode := RootNode.AddChild(Naim);
-//      FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
-//      FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
       with Rec.Fields.Fields[i].Description do
       begin
 
@@ -283,14 +276,12 @@ begin
           ValNode := FieldNode.AddChild(temp[1]);
           ValNode.Text := Rec.Fields.Fields[i].Values.Values[temp[1]];
         end;
-        // ValNode := FieldNode.AddChild('SubField');
-        // ValNode.Text := Rec.Fields.Fields[i].Values[j]
       end;
     end;
+  end;
 
   Memo1.Text := Memo1.Text + XMLDocument1.Xml.Text;
   XMLDocument1.SaveToFile('LastXML.xml');
-  // XMLDocument1.documentElement;
   LoadItems(nil, XMLDocument1.documentElement);
   self.Show();
 end;

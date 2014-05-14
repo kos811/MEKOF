@@ -1,0 +1,218 @@
+<Tags>
+	<tag ID="001">
+		<Title>Идентификатор подзаписи</Title>
+	</tag>
+	<tag ID="002">
+		<Title>Указатель подзаписей</Title>
+	</tag>
+	<tag ID="004">
+		<Title>Обозначение внешней базы данных</Title>
+	</tag>
+	<tag ID="005">
+		<Title>Обозначение заимствованной записи</Title>
+	</tag>
+	<tag ID="010">
+		<Title>ISBN</Title>
+		<Indicators>
+			<indicator ID="0">правильный ISBN</indicator>
+			<indicator ID="1">ошибочный ISBN</indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">ISBN</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="011">
+		<Title>ISSN</Title>
+		<Indicators>
+			<indicator ID="0">правильный ISBN</indicator>
+			<indicator ID="1">ошибочный ISBN</indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">ISBN</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="100">
+		<Title>Системные данные</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">вид документа</Identificator>
+			<Identificator ID="B">место издания (страна)</Identificator>
+			<Identificator ID="C">дата составления записи</Identificator>
+			<Identificator ID="E">признак ограничения распространения</Identificator>
+			<Identificator ID="M">дополнительные данные о виде патентного документа</Identificator>
+			<Identificator ID="N">страна патентования </Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="101">
+		<Title>Язык документа</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">язык основного текста</Identificator>
+			<Identificator ID="D">язык вспомогательного текста</Identificator>
+			<Identificator ID="E">язык реферата (аннотации)</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="102">
+		<Title>Физическая форма документа</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">физическая форма документа</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="200">
+		<Title>Заглавие и сведения об авторстве</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">основное заглавие</Identificator>
+			<Identificator ID="E">сведения, относящиеся к заглавию</Identificator>
+			<Identificator ID="F">сведения об ответственности</Identificator>
+			<Identificator ID="I">заглавие части и секции документа</Identificator>
+			<Identificator ID="K">язык основного заглавия</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="201">
+		<Title>Параллельное заглавие</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">параллельное заглавие</Identificator>
+			<Identificator ID="C">язык параллельного заглавия</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="206">
+		<Title>Параллельное заглавие</Title>
+		<Indicators>
+			<indicator ID="0">цифровая (только для подполей "А", "В" и "С")</indicator>
+			<indicator ID="I">буквенно-цифровая (только для подполя "Е")</indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">номер тома</Identificator>
+			<Identificator ID="B">номер выпуска</Identificator>
+			<Identificator ID="C">дата</Identificator>
+			<Identificator ID="E">нумерация</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="210">
+		<Title>Выходные данные</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">место издания (город)</Identificator>
+			<Identificator ID="B">издательство</Identificator>
+			<Identificator ID="C">дата издания</Identificator>
+			<Identificator ID="E">место печати (город)</Identificator>			
+			<Identificator ID="M">владелец авторского права</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="600">
+		<Title>УДК</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">Индекс</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="610">
+		<Title>МКИ</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">Индекс</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="620">
+		<Title>Рубрикатор</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">код рубрики</Identificator>
+			<Identificator ID="N">наименование</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="630">
+		<Title>Тезаурус</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">наименование</Identificator>
+			<Identificator ID="C">дескриптор</Identificator>
+			<Identificator ID="E">код дескриптора</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="640">
+		<Title>Ключевое слово</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">ключевое слово</Identificator>
+			<Identificator ID="C">язык ключевого слова</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="650">
+		<Title>Текст документа</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">текст документа</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="660">
+		<Title>Реферат (аннотация)</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">реферат (аннотация)</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="670">
+		<Title>Предметная рубрика</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="B">предметная рубрика</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="700">
+		<Title>Предметная рубрика</Title>
+		<Indicators>
+			<indicator ID="e"></indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">индивидуальный автор</Identificator>
+			<Identificator ID="B">место работы (наименование)</Identificator>
+			<Identificator ID="C">место работы (город)</Identificator>
+			<Identificator ID="D">место работы (страна)</Identificator>
+			<Identificator ID="E">другая форма имени</Identificator>
+		</Identificators>
+	</tag>
+	<tag ID="905">
+		<Title>Предметная рубрика</Title>
+		<Indicators>
+			<indicator ID="0">организация-хранитель документа</indicator>
+			<indicator ID="9">организация-хранитель перевода документа(только для подполя "А" )</indicator>
+		</Indicators>
+		<Identificators>
+			<Identificator ID="A">организация-хранитель документа</Identificator>
+			<Identificator ID="C">шифр хранения</Identificator>
+			<Identificator ID="E">страна хранения</Identificator>
+		</Identificators>
+	</tag>
+</Tags>
