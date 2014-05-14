@@ -275,18 +275,20 @@ var
   temp: string;
   val: string;
   p, p2: integer;
+  id:char;
 begin
   Result := TStringList.Create();
   temp := Source;
   while pos('+', temp) > 0 do
   begin
     p := pos('+', temp);
+    id := temp[p+1];
     delete(temp, 1, p);
     p := pos('+', temp);
     if p = 0 then
       p := Length(temp) + 1;
     val := copy(temp, 2, p - 2);
-    Result.Add(val);
+    Result.Values[id]:=val;
   end;
   if self.Description.Tag = '001' then
     Result.Add(Source);
@@ -387,7 +389,9 @@ begin
     700:
       Result := 'Лицо с первичной интеллектуальной ответственностью';
     905:
-      Result := 'Хранение документаэж';
+      Result := 'Хранение документа';
+    else
+        result := 'Unknown';
   end;
 
 end;

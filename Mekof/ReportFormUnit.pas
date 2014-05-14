@@ -61,9 +61,9 @@ begin
       begin
         temp := StringGrid1.Cells[j, i];
         excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Value := temp;
-//        excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].HorizontalAlignment
-//          := xlLeft;
-//        excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].VerticalAligment := xlTop;
+        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].HorizontalAlignment
+        // := xlLeft;
+        // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].VerticalAligment := xlTop;
         // excel.WorkBooks[1].WorkSheets[1].Cells[i + 1, j + 1].Borders
         // [xlInsideVertical].Weight := xlMedium;
       end;
@@ -259,13 +259,32 @@ begin
   for i := 0 to Rec.Fields.Length - 1 do
     for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
     begin
-      FieldNode := RootNode.AddChild('Field');
-      FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
-      FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
+      // FieldNode := RootNode.AddChild('Field');
+      // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
+      // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
+      Naim := StringReplace(Rec.Fields.Fields[i].Description.Naim, ' ', '_',
+        [rfReplaceAll]);
+      Naim := StringReplace(Naim, '(', '', [rfReplaceAll]);
+      Naim := StringReplace(Naim, ')', '', [rfReplaceAll]);
+      FieldNode := RootNode.AddChild(Naim);
+//      FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
+//      FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
       with Rec.Fields.Fields[i].Description do
       begin
-        ValNode := FieldNode.AddChild('SubField');
-        ValNode.Text := Rec.Fields.Fields[i].Values[j]
+
+        temp := Rec.Fields.Fields[i].Values[j];
+        if Rec.Fields.Fields[i].Description.Tag = '001' then
+        begin
+          ValNode := FieldNode.AddChild('id');
+          ValNode.Text := temp;
+        end
+        else
+        begin
+          ValNode := FieldNode.AddChild(temp[1]);
+          ValNode.Text := Rec.Fields.Fields[i].Values.Values[temp[1]];
+        end;
+        // ValNode := FieldNode.AddChild('SubField');
+        // ValNode.Text := Rec.Fields.Fields[i].Values[j]
       end;
     end;
 
