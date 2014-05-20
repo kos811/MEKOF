@@ -74,8 +74,8 @@ begin
   if Node.NodeName <> '#text' then
   begin
     if Node.IsTextElement then
-      str := format('%s="%s"',[Node.NodeName, Node.Text]);
-//      str := str + '=' + Node.Text;
+      str := format('%s="%s"', [Node.NodeName, Node.Text]);
+    // str := str + '=' + Node.Text;
 
     TreeNode := TreeView1.Items.AddChild(TreeNode, str);
     TreeNode.HasChildren := Node.HasChildNodes;
@@ -248,9 +248,6 @@ begin
   RootNode := XMLDocument1.AddChild('Record');
   for i := 0 to Rec.Fields.Length - 1 do
   begin
-    // FieldNode := RootNode.AddChild('Field');
-    // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
-    // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
     Naim := StringReplace(Rec.Fields.Fields[i].Description.Naim, ' ', '_',
       [rfReplaceAll]);
     Naim := StringReplace(Naim, '(', '', [rfReplaceAll]);
@@ -258,8 +255,7 @@ begin
     if Naim = '' then
       Naim := 'Метка_' + Rec.Fields.Fields[i].Description.Tag;
     FieldNode := RootNode.AddChild(Naim);
-    // FieldNode.Attributes['Name'] := Rec.Fields.Fields[i].Description.Naim;
-    // FieldNode.Attributes['Tag'] := Rec.Fields.Fields[i].Description.Tag;
+    FieldNode.Attributes['SecNo'] := Rec.Fields.Fields[i].Description.Chop;
     for j := 0 to Rec.Fields.Fields[i].Values.Count - 1 do
     begin
       with Rec.Fields.Fields[i].Description do
